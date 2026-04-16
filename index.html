@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HappyLighting Clone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>🎛️ Contrôle PAR LED</h1>
+
+  <!-- Connexion -->
+  <div class="card">
+    <button id="connect">🔵 Connecter un PAR</button>
+    <p id="status">Non connecté</p>
+  </div>
+
+  <!-- Gestion des PAR -->
+  <div class="card">
+    <h2>💡 Mes PAR</h2>
+    <div id="parGrid"></div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="showPage('manual', event)">🎨 Manuel</button>
+    <button class="nav-btn" onclick="showPage('setlist', event)">🎵 Setlist</button>
+  </div>
+
+  <!-- Page Manuel -->
+  <div id="page-manual">
+    <div class="card">
+      <h2>🎨 Couleurs</h2>
+      <div class="colors" id="colorGrid"></div>
+    </div>
+
+    <div class="card">
+      <h2>🎤 Réaction au son</h2>
+      <button id="micBtn">🎤 Démarrer micro</button>
+      <div class="volume-container">
+        <div id="volumeBar"></div>
+      </div>
+      <p style="color: #aaa; font-size: 0.85em; margin-top: 8px;">
+        La couleur choisie pulse au rythme de la musique
+      </p>
+    </div>
+  </div>
+
+  <!-- Page Setlist -->
+  <div id="page-setlist" style="display:none;">
+    <div class="card">
+      <h2>🎵 Setlist</h2>
+      <div id="setlistGrid"></div>
+    </div>
+
+    <div class="card">
+      <h2>🎤 Réaction au son</h2>
+      <button id="micBtn2">🎤 Démarrer micro</button>
+      <div class="volume-container">
+        <div id="volumeBar2"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
