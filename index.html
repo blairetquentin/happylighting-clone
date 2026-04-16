@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HappyLighting Clone</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -12,36 +13,36 @@
 
   <!-- Connexion -->
   <div class="card">
-    <button id="connect">🔵 Connecter un PAR</button>
+    <button id="connect">Connecter un PAR</button>
     <p id="status">Non connecté</p>
   </div>
 
   <!-- Gestion des PAR -->
   <div class="card">
-    <h2>💡 Mes PAR</h2>
+    <h2>Mes PAR</h2>
     <div id="parGrid"></div>
   </div>
 
   <!-- Navigation -->
   <div class="nav">
-    <button class="nav-btn active" onclick="showPage('manual', event)">🎨 Manuel</button>
-    <button class="nav-btn" onclick="showPage('setlist', event)">🎵 Setlist</button>
+    <button class="nav-btn active" onclick="showPage('manual', event)">Manuel</button>
+    <button class="nav-btn" onclick="showPage('setlist', event)">Setlist</button>
   </div>
 
   <!-- Page Manuel -->
   <div id="page-manual">
     <div class="card">
-      <h2>🎨 Couleurs</h2>
+      <h2>Couleurs</h2>
       <div class="colors" id="colorGrid"></div>
     </div>
 
     <div class="card">
-      <h2>🎤 Réaction au son</h2>
-      <button id="micBtn">🎤 Démarrer micro</button>
+      <h2>Réaction au son</h2>
+      <button id="micBtn">Démarrer micro</button>
       <div class="volume-container">
         <div id="volumeBar"></div>
       </div>
-      <p style="color: #aaa; font-size: 0.85em; margin-top: 8px;">
+      <p style="color: #555; font-size: 0.75em; margin-top: 10px; letter-spacing: 1px;">
         La couleur choisie pulse au rythme de la musique
       </p>
     </div>
@@ -49,14 +50,20 @@
 
   <!-- Page Setlist -->
   <div id="page-setlist" style="display:none;">
+
+    <!-- Éclairage de travail -->
     <div class="card">
-      <h2>🎵 Setlist</h2>
+      <button id="workLightBtn">Éclairage de travail</button>
+    </div>
+
+    <div class="card">
+      <h2>Setlist</h2>
       <div id="setlistGrid"></div>
     </div>
 
     <div class="card">
-      <h2>🎤 Réaction au son</h2>
-      <button id="micBtn2">🎤 Démarrer micro</button>
+      <h2>Réaction au son</h2>
+      <button id="micBtn2">Démarrer micro</button>
       <div class="volume-container">
         <div id="volumeBar2"></div>
       </div>

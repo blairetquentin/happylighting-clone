@@ -12,7 +12,6 @@ if (!navigator.bluetooth) {
 const SERVICE_UUID = '0000ffd5-0000-1000-8000-00805f9b34fb';
 const CHAR_UUID    = '0000ffd9-0000-1000-8000-00805f9b34fb';
 
-// 4 PAR connectés
 let parDevices = [];
 let currentColor = { r: 255, g: 0, b: 0 };
 let audioContext = null;
@@ -21,44 +20,45 @@ let isListening = false;
 let currentSong = null;
 let colorIndex = 0;
 let lastBeat = 0;
+let workLightOn = false;
 
 // Palette de couleurs
 const palette = [
-  { name: '🔴 Rouge sang',       r: 180, g: 0,   b: 0   },
-  { name: '🟠 Orange feu',       r: 255, g: 80,  b: 0   },
-  { name: '🟡 Jaune électrique', r: 255, g: 220, b: 0   },
-  { name: '🟢 Vert acide',       r: 100, g: 255, b: 0   },
-  { name: '🔵 Bleu électrique',  r: 0,   g: 80,  b: 255 },
-  { name: '🟣 Violet néon',      r: 150, g: 0,   b: 255 },
-  { name: '🩷 Rose flashy',      r: 255, g: 0,   b: 150 },
-  { name: '🩷 Rose bonbon',      r: 255, g: 100, b: 180 },
-  { name: '🩷 Rose pâle',        r: 255, g: 180, b: 210 },
-  { name: '🩷 Rose chaud',       r: 255, g: 20,  b: 100 },
-  { name: '⚪ Blanc pur',        r: 255, g: 255, b: 255 },
-  { name: '🩵 Cyan néon',        r: 0,   g: 255, b: 255 },
-  { name: '🟣 Magenta',          r: 255, g: 0,   b: 255 },
-  { name: '🔴 Rouge cramoisi',   r: 220, g: 20,  b: 60  },
-  { name: '🟢 Vert néon',        r: 0,   g: 255, b: 100 },
-  { name: '🔵 Bleu nuit',        r: 0,   g: 0,   b: 180 },
-  { name: '🌿 Vert celtique',    r: 0,   g: 100, b: 40  },
+  { name: 'Rouge sang',       r: 180, g: 0,   b: 0   },
+  { name: 'Orange feu',       r: 255, g: 80,  b: 0   },
+  { name: 'Jaune électrique', r: 255, g: 220, b: 0   },
+  { name: 'Vert acide',       r: 100, g: 255, b: 0   },
+  { name: 'Bleu électrique',  r: 0,   g: 80,  b: 255 },
+  { name: 'Violet néon',      r: 150, g: 0,   b: 255 },
+  { name: 'Rose flashy',      r: 255, g: 0,   b: 150 },
+  { name: 'Rose bonbon',      r: 255, g: 100, b: 180 },
+  { name: 'Rose pâle',        r: 255, g: 180, b: 210 },
+  { name: 'Rose chaud',       r: 255, g: 20,  b: 100 },
+  { name: 'Blanc pur',        r: 255, g: 255, b: 255 },
+  { name: 'Cyan néon',        r: 0,   g: 255, b: 255 },
+  { name: 'Magenta',          r: 255, g: 0,   b: 255 },
+  { name: 'Rouge cramoisi',   r: 220, g: 20,  b: 60  },
+  { name: 'Vert néon',        r: 0,   g: 255, b: 100 },
+  { name: 'Bleu nuit',        r: 0,   g: 0,   b: 180 },
+  { name: 'Vert celtique',    r: 0,   g: 100, b: 40  },
 ];
 
 // Setlist
 const setlist = [
-  { name: '🎵 Msct',             colors: ['🟣 Violet néon', '🩷 Rose flashy'] },
-  { name: '🎵 Lnasp',            colors: ['🩷 Rose flashy', '🟣 Violet néon', '🔵 Bleu électrique'] },
-  { name: '🎵 Machine à laver',  colors: ['🟢 Vert acide', '🔵 Bleu électrique'] },
-  { name: '🎵 Tlmsdc',           colors: ['🩷 Rose flashy', '⚪ Blanc pur'] },
-  { name: '🎵 Halloween',        colors: ['🟠 Orange feu', '🟢 Vert acide'] },
-  { name: '🎵 Ta gueule à poil', colors: ['🔴 Rouge sang', '🟡 Jaune électrique'] },
-  { name: '🎵 Super porno',      colors: ['🩷 Rose flashy', '🟣 Violet néon', '🔵 Bleu électrique'] },
-  { name: '🎵 Ballade',          colors: ['🟡 Jaune électrique', '🟠 Orange feu'] },
-  { name: '🎵 Discopunk',        colors: ['⚪ Blanc pur', '🔵 Bleu électrique'] },
-  { name: '🎵 Les films',        colors: ['🩷 Rose flashy', '🔴 Rouge sang'] },
-  { name: '🎵 Le marin',         colors: ['🔵 Bleu électrique', '🩵 Cyan néon', '🌿 Vert celtique'] },
-  { name: '🎵 Le rock',          colors: ['🔴 Rouge sang', '⚪ Blanc pur'] },
-  { name: '🍺 BitureMan',        colors: ['🟡 Jaune électrique', '🟠 Orange feu'] },
-  { name: '🏴‍☠️ Le pirate',      colors: ['🔵 Bleu nuit', '🔴 Rouge sang'] },
+  { name: 'Msct',             colors: ['Violet néon', 'Rose flashy'] },
+  { name: 'Lnasp',            colors: ['Rose flashy', 'Violet néon', 'Bleu électrique'] },
+  { name: 'Machine à laver',  colors: ['Vert acide', 'Bleu électrique'] },
+  { name: 'Tlmsdc',           colors: ['Rose flashy', 'Blanc pur'] },
+  { name: 'Halloween',        colors: ['Orange feu', 'Vert acide'] },
+  { name: 'Ta gueule à poil', colors: ['Rouge sang', 'Jaune électrique'] },
+  { name: 'Super porno',      colors: ['Rose flashy', 'Violet néon', 'Bleu électrique'] },
+  { name: 'Ballade',          colors: ['Jaune électrique', 'Orange feu'] },
+  { name: 'Discopunk',        colors: ['Blanc pur', 'Bleu électrique'] },
+  { name: 'Les films',        colors: ['Rose flashy', 'Rouge sang'] },
+  { name: 'Le marin',         colors: ['Bleu électrique', 'Cyan néon', 'Vert celtique'] },
+  { name: 'Le rock',          colors: ['Rouge sang', 'Blanc pur'] },
+  { name: 'BitureMan',        colors: ['Jaune électrique', 'Orange feu'] },
+  { name: 'Le pirate',        colors: ['Bleu nuit', 'Rouge sang'] },
 ];
 
 function sleep(ms) {
@@ -85,7 +85,6 @@ async function connectPAR() {
     const characteristic = await service.getCharacteristic(CHAR_UUID);
 
     parDevices.push({ device, characteristic, on: true });
-
     document.getElementById('status').textContent = `✅ ${parDevices.length} PAR connecté(s)`;
     renderParGrid();
 
@@ -118,7 +117,6 @@ async function togglePar(index) {
   par.on = !par.on;
 
   if (!par.on) {
-    // Éteindre
     try {
       const frame = new Uint8Array([0x56, 0, 0, 0, 0x00, 0xF0, 0xAA]);
       await par.characteristic.writeValue(frame);
@@ -126,7 +124,6 @@ async function togglePar(index) {
       console.error(err);
     }
   } else {
-    // Rallumer avec la couleur actuelle
     await setColorToPar(par, currentColor.r, currentColor.g, currentColor.b);
   }
 
@@ -139,7 +136,7 @@ function renderParGrid() {
   grid.innerHTML = '';
 
   if (parDevices.length === 0) {
-    grid.innerHTML = '<p style="color: #aaa; font-size: 0.9em;">Aucun PAR connecté</p>';
+    grid.innerHTML = '<p style="color: #555; font-size: 0.75em; letter-spacing: 1px;">Aucun PAR connecté</p>';
     return;
   }
 
@@ -147,8 +144,8 @@ function renderParGrid() {
     const btn = document.createElement('button');
     btn.className = 'par-btn' + (par.on ? ' par-on' : ' par-off');
     btn.innerHTML = `
-      <span>💡 PAR ${index + 1}</span>
-      <span>${par.on ? '✅ Allumé' : '⚫ Éteint'}</span>
+      <span>PAR ${index + 1}</span>
+      <span>${par.on ? 'ON' : 'OFF'}</span>
     `;
     btn.onclick = () => togglePar(index);
     grid.appendChild(btn);
@@ -170,8 +167,6 @@ function renderPalette() {
     const btn = document.createElement('button');
     btn.textContent = color.name;
     btn.style.background = `rgb(${color.r}, ${color.g}, ${color.b})`;
-    btn.style.color = 'white';
-    btn.style.textShadow = '0 1px 2px rgba(0,0,0,0.8)';
     btn.onclick = () => chooseColor(color.r, color.g, color.b, btn);
     grid.appendChild(btn);
   });
@@ -182,13 +177,12 @@ function renderSetlist() {
   const grid = document.getElementById('setlistGrid');
   setlist.forEach(song => {
     const colors = song.colors.map(name => getColorByName(name));
-
     const btn = document.createElement('button');
     btn.className = 'song-btn';
     btn.innerHTML = `
       <span class="song-name">${song.name}</span>
       <span class="song-colors">
-        ${colors.map(c => `<span class="color-dot" style="background: rgb(${c.r},${c.g},${c.b})"></span>`).join('')}
+        ${colors.map(c => `<span class="color-dot" style="background-color: rgb(${c.r},${c.g},${c.b});"></span>`).join('')}
       </span>
     `;
     btn.onclick = () => selectSong(song, btn);
@@ -201,6 +195,25 @@ function selectSong(song, btn) {
   currentSong = song;
   document.querySelectorAll('.song-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+}
+
+// Éclairage de travail
+async function toggleWorkLight() {
+  workLightOn = !workLightOn;
+  const btn = document.getElementById('workLightBtn');
+  if (workLightOn) {
+    await setColor(255, 255, 255);
+    btn.style.background = '#ffffff';
+    btn.style.color = '#000000';
+    btn.style.borderColor = '#ffffff';
+    btn.textContent = 'Éclairage de travail — ON';
+  } else {
+    await setColor(0, 0, 0);
+    btn.style.background = 'transparent';
+    btn.style.color = '#ffffff';
+    btn.style.borderColor = '#333';
+    btn.textContent = 'Éclairage de travail';
+  }
 }
 
 // Démarrer le micro (page manuel)
@@ -236,7 +249,7 @@ async function initMic(btnId, barId, isSetlistMode) {
     source.connect(analyser);
 
     isListening = true;
-    document.getElementById(btnId).textContent = '🔴 Stop micro';
+    document.getElementById(btnId).textContent = 'Stop micro';
     document.getElementById(btnId).onclick = () => stopMic(btnId, barId);
 
     analyzeBeat(barId, isSetlistMode);
@@ -250,7 +263,7 @@ function stopMic(btnId, barId) {
   isListening = false;
   colorIndex = 0;
   if (audioContext) audioContext.close();
-  document.getElementById(btnId).textContent = '🎤 Démarrer micro';
+  document.getElementById(btnId).textContent = 'Démarrer micro';
   if (btnId === 'micBtn') {
     document.getElementById(btnId).onclick = startMic;
     setColor(currentColor.r, currentColor.g, currentColor.b);
@@ -312,3 +325,4 @@ renderParGrid();
 document.getElementById('connect').onclick = connectPAR;
 document.getElementById('micBtn').onclick = startMic;
 document.getElementById('micBtn2').onclick = startMic2;
+document.getElementById('workLightBtn').onclick = toggleWorkLight;
